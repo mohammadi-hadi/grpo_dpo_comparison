@@ -1,0 +1,14 @@
+torch>=2.4
+transformers>=4.51
+peft>=0.14
+accelerate>=1.0
+datasets>=3.0
+sentencepiece
+pandas
+numpy
+scipy>=1.11
+statsmodels
+matplotlib
+openai>=1.60
+openpyxl
+tqdm
