@@ -201,29 +201,39 @@ def fig_quadrants():
 
 
 def fig_judge_agreement():
-    """5x5 heatmap: original Gemma-3-27B judge (aggregate only exists per run)
-    vs GPT-5-mini — drawn from per-generation judge caches when both exist."""
-    path = AGG / "judge_agreement.csv"
-    if not path.exists():
-        print("skip judge_agreement (no judge_agreement.csv)")
+    """System-level judge agreement: original Gemma-3-27B aggregates (table1)
+    vs GPT-5-mini re-evaluation aggregates, one point per fine-tuned model."""
+    t1 = AGG / "table1.csv"
+    agg = AGG / "aggregate_new.csv"
+    if not (t1.exists() and agg.exists()):
+        print("skip judge_agreement (missing aggregates)")
         return
-    mat = pd.read_csv(path, index_col=0).values
-    fig, ax = plt.subplots(figsize=(COL_W, 2.5))
-    ramp = ["#ffffff", "#cde2fb", "#9ec5f4", "#6da7ec", "#3987e5", "#1c5cab",
-            "#0d366b"]
-    from matplotlib.colors import LinearSegmentedColormap
-    cmap = LinearSegmentedColormap.from_list("blues", ramp)
-    im = ax.imshow(mat, cmap=cmap, origin="lower")
-    for i in range(mat.shape[0]):
-        for j in range(mat.shape[1]):
-            if mat[i, j] > 0:
-                lum = mat[i, j] / mat.max()
-                ax.text(j, i, int(mat[i, j]), ha="center", va="center",
-                        fontsize=6, color="white" if lum > 0.55 else INK)
-    ax.set_xticks(range(5), [1, 2, 3, 4, 5])
-    ax.set_yticks(range(5), [1, 2, 3, 4, 5])
-    ax.set_xlabel("GPT-5-mini score")
-    ax.set_ylabel("Gemma 3 27B score")
+    orig = pd.read_csv(t1)
+    new = pd.read_csv(agg)
+    fig, ax = plt.subplots(figsize=(COL_W, 2.6))
+    ax.plot([0, 1], [0, 1], color=GRID, lw=1, zorder=0)
+    for _, r in new.iterrows():
+        o = orig[
+            (orig.method == r["method"])
+            & (orig.size_b == float(r["size"].replace("b", "")))
+        ]["llm_judge_gemma3_27b"].iloc[0]
+        color = C_GRPO if r["method"] == "grpo" else C_DPO
+        ax.scatter(o, r["judge_score_first"], s=42, color=color, zorder=3,
+                   edgecolor="white", linewidth=1.2)
+        dx, dy = (5, 3) if r["method"] == "grpo" else (-5, -9)
+        ax.annotate(r["size"].replace("b", "B"),
+                    (o, r["judge_score_first"]),
+                    textcoords="offset points", xytext=(dx, dy),
+                    ha="left" if r["method"] == "grpo" else "right",
+                    fontsize=6.5, color=INK)
+    style_axis(ax)
+    ax.set_xlim(0, 1)
+    ax.set_ylim(0, 1)
+    ax.set_xlabel("Gemma 3 27B (original eval)")
+    ax.set_ylabel("GPT-5-mini (re-evaluation)")
+    handles = [plt.Line2D([], [], marker="o", ls="", color=c, label=l)
+               for c, l in [(C_GRPO, "GRPO"), (C_DPO, "DPO")]]
+    ax.legend(handles=handles, loc="upper left", fontsize=7)
     fig.savefig(OUT / "judge_agreement.pdf")
     plt.close(fig)
     print("wrote judge_agreement.pdf")
