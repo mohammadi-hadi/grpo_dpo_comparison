@@ -25,13 +25,12 @@ GRPO at 14B achieves the best scores on every metric, including a +56.4% relativ
 
 ```
 notebooks/            Original training and evaluation notebooks (CUDA / Unsloth QLoRA)
-src/judge_original/   Original LLM-as-a-Judge scripts (Gemma 3 27B, CUDA)
 src/eval/             Portable re-evaluation pipeline (Apple Silicon / MPS, CUDA optional)
 results/aggregate/    Aggregate metrics (results.xlsx, table1.csv)
 results/per_example/  Per-example generations and scores from the re-evaluation
 results/training_logs/  GRPO trainer states (per-step reward/KL curves)
 figures/              Plotting code and figures
-adapters/             LoRA adapter download instructions (weights on Hugging Face Hub)
+adapters/             LoRA adapter instructions (weights as anonymized supplementary material)
 ```
 
 ## Setup
@@ -44,7 +43,7 @@ pip install -r requirements.txt
 
 ## Fine-tuned adapters
 
-Eight LoRA adapters (PEFT format) are available on the Hugging Face Hub — see `adapters/README.md`. Bases are Qwen2.5-Instruct models:
+Eight LoRA adapters (PEFT format) are provided as anonymized supplementary material for review — see `adapters/README.md`. Bases are Qwen2.5-Instruct models:
 
 | Method | LoRA rank / alpha | Epochs | Checkpoints |
 |--------|-------------------|--------|-------------|

@@ -1,7 +1,7 @@
 """LLM-as-a-Judge via the OpenAI API.
 
 Rubric text is byte-for-byte the one used with the original Gemma 3 27B
-judge (src/judge_original/gsm8k_llm_judge_batch_*.py), including the
+judge, including the
 fallback conventions: no reasoning -> score 1, unparseable reply -> score 3.
 Normalization: (score - 1) / 4 onto [0, 1].
 """

@@ -1,8 +1,6 @@
 # LoRA adapters
 
-The eight fine-tuned LoRA adapters (PEFT format) are hosted on the Hugging Face Hub:
-
-**https://huggingface.co/hadimh93/qwen2.5-gsm8k-grpo-dpo-adapters**
+The eight fine-tuned LoRA adapters (PEFT format) are provided as anonymized supplementary material for review. The public Hugging Face Hub repository will be linked at de-anonymization.
 
 | Subfolder | Base model | LoRA r/α | Checkpoint |
 |-----------|------------|----------|------------|
@@ -22,7 +20,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 from peft import PeftModel
 
 base = AutoModelForCausalLM.from_pretrained("Qwen/Qwen2.5-14B-Instruct", torch_dtype="bfloat16")
-model = PeftModel.from_pretrained(base, "hadimh93/qwen2.5-gsm8k-grpo-dpo-adapters", subfolder="grpo-14b")
+model = PeftModel.from_pretrained(base, "adapters/grpo/grpo-14b-checkpoint-114")
 ```
 
 Note: adapters were trained with QLoRA on 4-bit quantized bases (`unsloth/qwen2.5-*-instruct-unsloth-bnb-4bit`). Applying them to full-precision bases is standard practice and is what the evaluation pipeline in `src/eval/` does; minor numerical differences relative to 4-bit inference are possible.
