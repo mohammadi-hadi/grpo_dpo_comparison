@@ -1,12 +1,29 @@
-# GRPO vs. DPO for Faithful Chain-of-Thought Reasoning
+# Chain-of-Thought Faithfulness Under GRPO and DPO Fine-Tuning
 
 Code, adapters, and evaluation results for a controlled comparison of **Group Relative Policy Optimization (GRPO)** and **Direct Preference Optimization (DPO)** as fine-tuning strategies for improving the faithfulness of chain-of-thought (CoT) reasoning in large language models.
 
 We fine-tune Qwen2.5-Instruct models at four scales (1.5B, 3B, 7B, 14B) with each method on GSM8K-derived data and evaluate them on five metrics covering accuracy, reliability, and reasoning faithfulness.
 
-## Results (original evaluation)
+## Results
 
-200 GSM8K test questions, 3 samples per question at temperature 0.7. Judge: Gemma 3 27B (1–5 rubric, normalized to [0,1]).
+Primary results are from the bf16 re-evaluation reported in the paper: 200 GSM8K test questions (fixed seed), five samples per question at temperature 0.7 plus a true-greedy pass, NLI entailment, and an LLM judge (GPT-5-mini). Values are means over 200 paired questions; 95% bootstrap CIs and paired significance tests are in the paper. Bold marks the better method within a scale where the paired test is significant (Holm-corrected, p < .05).
+
+| Size | Method | Greedy | pass@1 | Self-Cons. | Cons. Ratio | Entailment | Judge |
+|------|--------|-------:|-------:|-----------:|------------:|-----------:|------:|
+| 1.5B | DPO  | .425 | .345 | .615 | **.664** | .319 | .379 |
+| 1.5B | GRPO | .470 | .350 | .555 | .528 | **.539** | .375 |
+| 3B   | DPO  | .135 | .200 | .510 | .659 | .176 | .228 |
+| 3B   | GRPO | **.265** | .205 | .530 | .689 | **.427** | .206 |
+| 7B   | DPO  | .430 | .390 | .610 | .651 | .199 | .427 |
+| 7B   | GRPO | **.750** | **.650** | **.875** | **.834** | **.507** | **.655** |
+| 14B  | DPO  | .780 | .735 | .870 | .874 | .353 | .740 |
+| 14B  | GRPO | .830 | .775 | **.935** | .891 | **.491** | .711 |
+
+GRPO's reasoning entails its answer significantly more often at every scale (entailment margins +.14 to +.31, all p < 1e-7) and sweeps every metric at 7B, while DPO matches GRPO's accuracy at 14B at a fraction of the training cost.
+
+### Original evaluation (for comparison)
+
+The earlier evaluation (3 samples per question, 4-bit inference, Gemma 3 27B judge) is kept for comparison; per-example records for both are under `results/`.
 
 | Method | Size (B) | Greedy Acc. | Self-Cons. | Cons. Ratio | NLI | LLM-Judge |
 |--------|---------:|------------:|-----------:|------------:|------:|----------:|
@@ -17,9 +34,7 @@ We fine-tune Qwen2.5-Instruct models at four scales (1.5B, 3B, 7B, 14B) with eac
 | GRPO   | 1.5      | 0.250       | 0.310      | 0.512       | 0.476 | 0.120     |
 | GRPO   | 3        | 0.055       | 0.120      | 0.197       | 0.079 | 0.235     |
 | GRPO   | 7        | 0.720       | 0.810      | 0.813       | 0.470 | 0.374     |
-| GRPO   | 14       | **0.755**   | **0.885**  | **0.902**   | **0.491** | **0.748** |
-
-GRPO at 14B achieves the best scores on every metric, including a +56.4% relative improvement in NLI faithfulness and +29.9% in LLM-judge score over DPO at the same scale.
+| GRPO   | 14       | 0.755       | 0.885      | 0.902       | 0.491 | 0.748     |
 
 ## Repository structure
 
