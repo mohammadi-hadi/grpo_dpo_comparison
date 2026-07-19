@@ -4,6 +4,10 @@ Code, adapters, and evaluation results for a controlled comparison of **Group Re
 
 We fine-tune Qwen2.5-Instruct models at four scales (1.5B, 3B, 7B, 14B) with each method on GSM8K-derived data and evaluate them on five metrics covering accuracy, reliability, and reasoning faithfulness.
 
+## Paper status
+
+The paper ("Chain-of-Thought Faithfulness Under GRPO and DPO Fine-Tuning") is under review as a declared dual submission at **INLG 2026** (archival long paper) and **BlackboxNLP 2026** (EMNLP 2026 workshop, archival track), both submitted July 18, 2026; it will be published at exactly one of the two (INLG notifies Aug 15, BlackboxNLP Aug 27/Sep 8). This repository stays private during review; at camera-ready it goes public and the eight LoRA adapters are uploaded to the Hugging Face Hub. Submission packaging and timelines are tracked in the private submissions hub.
+
 ## Results
 
 Primary results are from the bf16 re-evaluation reported in the paper: 200 GSM8K test questions (fixed seed), five samples per question at temperature 0.7 plus a true-greedy pass, NLI entailment, and an LLM judge (GPT-5-mini). Values are means over 200 paired questions; 95% bootstrap CIs and paired significance tests are in the paper. Bold marks the better method within a scale where the paired test is significant (Holm-corrected, p < .05).
