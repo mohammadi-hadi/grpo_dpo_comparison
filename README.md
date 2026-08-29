@@ -1,12 +1,22 @@
-# Chain-of-Thought Faithfulness Under GRPO and DPO Fine-Tuning
+# Reasoning–Answer Entailment Under GRPO and DPO Fine-Tuning
 
-Code, adapters, and evaluation results for a controlled comparison of **Group Relative Policy Optimization (GRPO)** and **Direct Preference Optimization (DPO)** as fine-tuning strategies for improving the faithfulness of chain-of-thought (CoT) reasoning in large language models.
+Code, adapters, and evaluation results for a controlled comparison of **Group Relative Policy Optimization (GRPO)** and **Direct Preference Optimization (DPO)** as post-training recipes, centered on **reasoning–answer entailment**: whether the reasoning a model states supports the answer it gives. Entailment is a necessary condition for faithful chain-of-thought reasoning, not a certificate of it, and the paper scopes its claims accordingly.
 
-We fine-tune Qwen2.5-Instruct models at four scales (1.5B, 3B, 7B, 14B) with each method on GSM8K-derived data and evaluate them on five metrics covering accuracy, reliability, and reasoning faithfulness.
+We fine-tune Qwen2.5-Instruct models at four scales (1.5B, 3B, 7B, 14B) with each method on GSM8K-derived data and evaluate them on six metrics covering accuracy, reliability, and reasoning–answer entailment.
 
-## Paper status
+## Paper
 
-The paper ("Chain-of-Thought Faithfulness Under GRPO and DPO Fine-Tuning") is under review as a declared dual submission at **INLG 2026** (archival long paper) and **BlackboxNLP 2026** (EMNLP 2026 workshop, archival track), both submitted July 18, 2026; it will be published at exactly one of the two (INLG notifies Aug 15, BlackboxNLP Aug 27/Sep 8). This repository stays private during review; at camera-ready it goes public and the eight LoRA adapters are uploaded to the Hugging Face Hub. Submission packaging and timelines are tracked in the private submissions hub.
+Accepted at **INLG 2026** (archival long paper, presented as a poster), Utrecht, 17–21 October 2026. To appear in the Proceedings of INLG 2026 (ACL Anthology).
+
+```bibtex
+@inproceedings{mohammadi2026entailment,
+  title     = {Reasoning--Answer Entailment Under {GRPO} and {DPO} Fine-Tuning},
+  author    = {Mohammadi, Hadi and Giachanou, Anastasia},
+  booktitle = {Proceedings of the International Natural Language Generation Conference (INLG)},
+  year      = {2026},
+  note      = {To appear}
+}
+```
 
 ## Results
 
@@ -23,7 +33,7 @@ Primary results are from the bf16 re-evaluation reported in the paper: 200 GSM8K
 | 14B  | DPO  | .780 | .735 | .870 | .874 | .353 | .740 |
 | 14B  | GRPO | .830 | .775 | **.935** | .891 | **.491** | .711 |
 
-GRPO's reasoning entails its answer significantly more often at every scale (entailment margins +.14 to +.31, all p < 1e-7) and sweeps every metric at 7B, while DPO matches GRPO's accuracy at 14B at a fraction of the training cost.
+GRPO's reasoning entails its answer significantly more often at every scale (entailment margins +.14 to +.31, all p < 1e-7) and sweeps every metric at 7B, while DPO matches GRPO's greedy and pass@1 accuracy at 14B at lower training cost (self-consistency still favors GRPO).
 
 ### Original evaluation (for comparison)
 
@@ -44,7 +54,6 @@ The earlier evaluation (3 samples per question, 4-bit inference, Gemma 3 27B jud
 
 ```
 notebooks/            Original training and evaluation notebooks (CUDA / Unsloth QLoRA)
-src/judge_original/   Original LLM-as-a-Judge scripts (Gemma 3 27B, CUDA)
 src/eval/             Portable re-evaluation pipeline (Apple Silicon / MPS, CUDA optional)
 results/aggregate/    Aggregate metrics (results.xlsx, table1.csv)
 results/per_example/  Per-example generations and scores from the re-evaluation
