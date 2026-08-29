@@ -11,7 +11,7 @@ import argparse
 
 
 def main():
-    ap = argparse.ArgumentParser(description="GRPO/DPO faithfulness evaluation")
+    ap = argparse.ArgumentParser(description="GRPO/DPO reasoning-answer entailment evaluation")
     ap.add_argument("--method", choices=["grpo", "dpo"])
     ap.add_argument("--size", choices=["1.5b", "3b", "7b", "14b"])
     ap.add_argument(
