@@ -1,4 +1,4 @@
-"""Publication figures for the GRPO vs DPO faithfulness study.
+"""Publication figures for the GRPO vs DPO reasoning-answer entailment study.
 
 Every figure reads from results/ files (no hardcoded data). Figures whose
 inputs are missing are skipped, so the script can run at any pipeline stage.
