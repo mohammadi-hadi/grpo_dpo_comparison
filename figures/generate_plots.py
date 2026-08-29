@@ -66,24 +66,33 @@ def fig_training_dynamics():
     if not files:
         print("skip training_dynamics (no logs)")
         return
-    fig, ax = plt.subplots(figsize=(COL_W, 2.2))
+    # One distinct CVD-safe color per model size (not a single-hue ramp), a
+    # bold exponentially smoothed line (span 5) over the faint raw steps, and
+    # both a legend and end labels, per the camera-ready version of Figure 3.
+    colors = {"1.5b": "#0072B2", "3b": "#E69F00", "7b": "#009E73", "14b": "#8E4B9E"}
+    fig, ax = plt.subplots(figsize=(COL_W, 1.7))
     order = {"1.5b": 0, "3b": 1, "7b": 2, "14b": 3}
-    for f in files:
+    for f in sorted(files, key=lambda f: order.get(f.name.split("-")[1], 0)):
         size = f.name.split("-")[1]
         hist = json.load(open(f))["log_history"]
         steps = [h["step"] for h in hist if "rewards/check_answer/mean" in h]
         vals = [h["rewards/check_answer/mean"] for h in hist
                 if "rewards/check_answer/mean" in h]
-        i = order.get(size, 0)
-        ax.plot(steps, vals, color=BLUE_RAMP[i], lw=2,
-                solid_capstyle="round", label=size.upper().replace("B", "B"))
-        ax.annotate(size.replace("b", "B"), (steps[-1], vals[-1]),
-                    textcoords="offset points", xytext=(4, 0),
-                    fontsize=7, color=INK, va="center")
+        c = colors.get(size, INK)
+        smooth = pd.Series(vals).ewm(span=5).mean()
+        ax.plot(steps, vals, color=c, lw=0.6, alpha=0.25)
+        ax.plot(steps, smooth, color=c, lw=1.6, solid_capstyle="round",
+                label=size.replace("b", "B"))
+        ax.annotate(size.replace("b", "B"), (steps[-1], smooth.iloc[-1]),
+                    textcoords="offset points", xytext=(3, 0),
+                    fontsize=6, color=c, va="center")
     style_axis(ax)
     ax.set_xlabel("Training step")
-    ax.set_ylabel("Answer-correctness reward")
-    ax.set_xlim(right=ax.get_xlim()[1] * 1.12)  # room for end labels
+    ax.set_ylabel("Answer-correctness reward", fontsize=6)
+    ax.set_xlim(right=ax.get_xlim()[1] * 1.10)  # room for end labels
+    ax.legend(loc="lower right", fontsize=5.5, frameon=False,
+              handlelength=1.2, borderaxespad=0.2)
+    fig.tight_layout(pad=0.3)
     fig.savefig(OUT / "training_dynamics.pdf")
     plt.close(fig)
     print("wrote training_dynamics.pdf")
